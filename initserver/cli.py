@@ -23,7 +23,6 @@ LOG = logging.getLogger(__name__)
 
 def run():
     loop = asyncio.get_event_loop()
-    LOG.info("Starting")
     default_key = os.path.expanduser("~/.ssh/id_rsa.pub")
     s = server.CloudInitServer(loop, ssh_keys=[default_key])
     loop.run_until_complete(s.start())

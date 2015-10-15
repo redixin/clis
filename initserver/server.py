@@ -53,6 +53,7 @@ class AWS:
             return self.user_data(request)
         if path == "meta-data/":
             return self.meta_data(request)
+        return web.Response(body=b"Not found", status=404)
 
     def index(self, request):
         return web.Response(body=b"Not found", status=404)
@@ -72,6 +73,7 @@ class OpenStack:
 
     def get_metadata(self, request):
         remote_host = request.transport.get_extra_info("peername")[0]
+        LOG.info("Metadata request from %s" % remote_host)
         keys = {}
         for i, key in enumerate(self.server.ssh_public_keys):
             keys["key-" + str(i)] = key
@@ -157,7 +159,7 @@ class CloudInitServer:
         addr = self.config.get("listen_addr", "0.0.0.0")
         port = self.config.get("listen_port", 8081)
         self.srv = yield from self.loop.create_server(self.handler, addr, port)
-        LOG.debug("Metadata server started at %s:%s" % (addr, port))
+        LOG.info("Metadata server started at %s:%s" % (addr, port))
 
     @asyncio.coroutine
     def index(self, request):
