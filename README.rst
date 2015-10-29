@@ -1,27 +1,38 @@
-How to boot cloud image on localhost
-####################################
+How to use cloud images without cloud
+#####################################
 
-Short answer
-************
-
-Use clis:: 
+Use clis::
 
     sudo apt-get install python3-pip
     sudo pip3 install clis
     sudo iptables -t nat -I PREROUTING -d 169.254.169.254/32 -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8088
     clis
 
-Now you can boot images downloaded from `here <https://cloud-images.ubuntu.com/>`_
-(filename matches `*-disk1.img`).
+Now you can boot images downloaded from
+`here <https://cloud-images.ubuntu.com/>`_ (filename matches `*-disk1.img`).
 
-Known to work vivid and trusty.
+Known to work with vivid and trusty.
 
-Server will feed your ssh key (~/.ssh/id_rsa.pub) to image and
-you can log in via ssh. Default username for ubuntu images is `ubuntu`.
+Server will feed your ssh key (~/.ssh/id_rsa.pub) to image and you can log in
+via ssh. Default username for ubuntu images is `ubuntu`.
 
-After boot you may want to uninstall cloud-init from VM and turn it to usual non-cloud image.
+It is poosible to specify alternate ssh public key(s) by command line::
 
-Long answer
-***********
+    clis -k ~/.ssh/alternate.pub -k ~/.ssh/backup.pub
 
-`Here should be more info about cloud-init`
+When clis is running you may boot cloud image and see ip address of VM in
+logs. Just ssh to this address::
+
+    ssh ubuntu@192.168.122.42
+
+You may want to uninstall cloud-init from VM and turn it to non-cloud image::
+
+    ubuntu@vm-192-168.122.42:~$ sudo apt-get remove cloud-init
+
+What is cloud-init
+******************
+
+Cloud image is usual image with `cloud-init` package installed. Cloud-init is
+software which trying to access magic url http://169.254.169.254/ and get
+configuration from there. There is a lot of versions of cloud-init "protocol"
+and all this versions are poorly documented or not documented at all.
