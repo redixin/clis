@@ -15,16 +15,16 @@ import asyncio
 import os
 import logging
 
-from initserver import server
+from clis import clis
 
 logging.basicConfig(level=logging.INFO)
-
 LOG = logging.getLogger(__name__)
+
 
 def run():
     loop = asyncio.get_event_loop()
     default_key = os.path.expanduser("~/.ssh/id_rsa.pub")
-    s = server.CloudInitServer(loop, ssh_keys=[default_key])
+    s = clis.Server(loop, ssh_keys=[default_key])
     loop.run_until_complete(s.start())
     LOG.info("Entering event loop")
     loop.run_forever()

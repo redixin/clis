@@ -18,7 +18,6 @@ import uuid
 
 import yaml
 import json
-import aiohttp
 from aiohttp import web
 
 LOG = logging.getLogger(__name__)
@@ -29,9 +28,8 @@ class AWS:
 
     layout:
         /2009-04-04/meta-data/instance-id
-    
     """
-    
+
     def __init__(self, server):
         self.server = server
 
@@ -120,7 +118,8 @@ class OpenStack:
     def index(self, request):
         return web.Response(body=b"2012-08-10/\nlatest")
 
-class CloudInitServer:
+
+class Server:
     """Metadata server for cloud-init."""
 
     def __init__(self, loop, **config):
@@ -139,8 +138,8 @@ class CloudInitServer:
                 "manage_etc_hosts": True,
                 "ssh_authorized_keys": self.ssh_public_keys,
         }
-        self.user_data = b"#cloud-config\n" + yaml.safe_dump(self.user_data,
-            default_flow_style=False).encode("utf8")
+        self.user_data = b"#cloud-config\n" + yaml.safe_dump(
+            self.user_data, default_flow_style=False).encode("utf8")
         self._cache = {}
 
     @asyncio.coroutine
@@ -157,7 +156,7 @@ class CloudInitServer:
         r("GET", "/{path:.+}", aws.index)
         self.handler = self.app.make_handler(access_log=LOG)
         addr = self.config.get("listen_addr", "0.0.0.0")
-        port = self.config.get("listen_port", 8081)
+        port = self.config.get("listen_port", 8088)
         self.srv = yield from self.loop.create_server(self.handler, addr, port)
         LOG.info("Metadata server started at %s:%s" % (addr, port))
 
@@ -171,9 +170,3 @@ class CloudInitServer:
         self.srv.close()
         yield from self.srv.wait_closed()
         yield from self.app.finish()
-
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    s = CloudInitServer(loop)
-    asyncio.async(s.start(), loop=loop)
-    loop.run_forever()
