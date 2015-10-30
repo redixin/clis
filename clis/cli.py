@@ -13,9 +13,10 @@
 
 import asyncio
 import argparse
-import os, sys
-import logging
 import configparser
+import os
+import sys
+import logging
 
 from clis import clis
 
