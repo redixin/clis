@@ -82,6 +82,8 @@ def run():
     LOG.info("Starting with keys %s" % ssh_keys)
     loop = asyncio.get_event_loop()
     s = clis.Server(loop, ssh_keys=ssh_keys)
-    loop.run_until_complete(s.start())
     LOG.info("Entering event loop")
-    loop.run_forever()
+    try:
+        loop.run_until_complete(s.run())
+    except KeyboardInterrupt:
+        pass

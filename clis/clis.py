@@ -136,6 +136,8 @@ class Server:
                         self.ssh_public_keys.append(line.strip())
         self.user_data = {
                 "manage_etc_hosts": True,
+                "disable_root": 0,
+                "ssh_pwauth": True,
                 "ssh_authorized_keys": self.ssh_public_keys,
         }
         self.user_data = b"#cloud-config\n" + yaml.safe_dump(
@@ -143,7 +145,7 @@ class Server:
         self._cache = {}
 
     @asyncio.coroutine
-    def start(self):
+    def run(self):
         openstack = OpenStack(self)
         aws = AWS(self)
         self.app = web.Application(loop=self.loop)
@@ -159,14 +161,16 @@ class Server:
         port = self.config.get("listen_port", 8088)
         self.srv = yield from self.loop.create_server(self.handler, addr, port)
         LOG.info("Metadata server started at %s:%s" % (addr, port))
+        try:
+            yield from self.srv.wait_closed()
+        except asyncio.CancelledError:
+            pass
+        finally:
+            yield from self.handler.finish_connections(1.0)
+            self.srv.close()
+            yield from self.srv.wait_closed()
+            yield from self.app.finish()
 
     @asyncio.coroutine
     def index(self, request):
         return web.Response(body=b"/openstack/")
-
-    @asyncio.coroutine
-    def stop(self, timeout=1.0):
-        yield from self.handler.finish_connections(timeout)
-        self.srv.close()
-        yield from self.srv.wait_closed()
-        yield from self.app.finish()
