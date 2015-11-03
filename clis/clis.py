@@ -34,13 +34,13 @@ class AWS:
         self.server = server
 
     def instance_id(self, request):
-        return web.Response(body=b"wat")
+        return web.Response(body=b"not implemented")
 
     def meta_data(self, request):
-        return web.Response(body=b"wat")
+        return web.Response(body=b"not implemented")
 
     def user_data(self, request):
-        return web.Response(body=b"wat")
+        return web.Response(body=b"not implemented")
 
     def handler(self, request):
         path = request.match_info["path"]
@@ -156,7 +156,7 @@ class Server:
         r("GET", "/openstack/{version}/{path:.*}", openstack.handler)
         r("GET", "/{version:.+}/{path:.+}", aws.handler)
         r("GET", "/{path:.+}", aws.index)
-        self.handler = self.app.make_handler(access_log=LOG)
+        self.handler = self.app.make_handler()
         addr = self.config.get("listen_addr", "0.0.0.0")
         port = self.config.get("listen_port", 8088)
         self.srv = yield from self.loop.create_server(self.handler, addr, port)
