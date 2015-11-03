@@ -86,4 +86,4 @@ def run():
     try:
         loop.run_until_complete(s.run())
     except KeyboardInterrupt:
-        pass
+        LOG.info("Interrupted")

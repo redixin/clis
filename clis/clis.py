@@ -165,11 +165,12 @@ class Server:
             yield from self.srv.wait_closed()
         except asyncio.CancelledError:
             pass
-        finally:
-            yield from self.handler.finish_connections(1.0)
-            self.srv.close()
-            yield from self.srv.wait_closed()
-            yield from self.app.finish()
+        except KeyboardInterrupt:
+            return
+        yield from self.handler.finish_connections(1.0)
+        self.srv.close()
+        yield from self.srv.wait_closed()
+        yield from self.app.finish()
 
     @asyncio.coroutine
     def index(self, request):
