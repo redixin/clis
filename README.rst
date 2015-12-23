@@ -34,5 +34,6 @@ What is cloud-init
 
 Cloud image is usual image with `cloud-init` package installed. Cloud-init is
 software which trying to access magic url http://169.254.169.254/ and get
-configuration from there. There is a lot of versions of cloud-init "protocol"
-and all this versions are poorly documented or not documented at all.
+VM configuration from there. Different versions of cloud-init "protocol"
+supported by different versions of images. All this versions are poorly
+documented or not documented at all.
